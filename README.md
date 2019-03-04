@@ -12,37 +12,38 @@ Angular routing step-01
     * Activate route
     
 ## définir le base path ##
-
-Deux façon pour le faire :
-
-   
-    1. Le faire à la main 
-    2. Utiliser Angular CLI
-
 `ng build --base-href /ateam/`
-
-`<base href="/">`
-
-`(localhost:4200)`
-
-`<base href="/ateam/">`
-
 ## importer Angular Routing ##
-
-RouterModule c'est un module externe 
-
-Service =>  gérer la navigation et la manipulation de l'url  
-Configuration => pour configurer les routes 
-Directives => 
-- RouterLink=> les élements cliquable 
-- RouterLinkActive=> style des elements active 
-- RouterOutlet=> quand il faut afficher une template 
-
-Avant d'utiliser le routage il faut importer le RouterModule dans le app.module.ts
+```javascript 
 import { RouterModule } from '@angular/router';
+
 @NgModule({
   imports: [
     BrowserModule,
-    RouterModule
+    HttpClientModule,
+    InMemoryWebApiModule.forRoot(FilmData, { delay: 1000 }),
+    RouterModule.forRoot([]),
   ],...
- 
+```
+
+
+### Ajouter la configuration de routes  ###
+Ajouter la configuration de routes dans la déclaration de notre RouterModule
+```javascript    
+      RouterModule.forRoot([
+      { path: 'welcome', component: ATeamComponent },
+      { path: '', redirectTo: 'welcome', pathMatch: 'full' },
+      { path: '**', component: PageNotFoundComponent }
+    ]),
+```
+
+#### Mettre en place les directives dans les templates ####
+Ajouter les directives routerLink dans le app.component.html
+```html
+    <li class="nav-item">
+      <a class="nav-link" [routerLink]="['/welcome']">Accueil</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link">Films</a>
+    </li>
+```

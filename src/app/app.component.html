@@ -5,7 +5,7 @@
       <a class="nav-link" [routerLink]="['/welcome']">Accueil</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link">Films</a>
+      <a class="nav-link" [routerLink]="['/films']">Films</a>
     </li>
     <li class="nav-item">
       <a class="nav-link">Ajouter un film</a>
@@ -19,7 +19,7 @@
       <a class="nav-link">Afficher message</a>
     </li>
     <li class="nav-item" *ngIf="!isLoggedIn">
-      <a class="nav-link">se connecter</a>
+      <a class="nav-link" [routerLink]="['/login']">se connecter</a>
     </li>
     <li class="nav-item" *ngIf="isLoggedIn">
       <a class="nav-link" (click)="logOut()">déconnexion</a>

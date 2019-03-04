@@ -1,3 +1,4 @@
+import { AppRoutingModule } from './app-routing.module';
 import { UserModule } from './user/user.module';
 import { MessageModule } from './messages/message.module';
 import { PageNotFoundComponent } from './page-not-found.component';
@@ -13,7 +14,6 @@ import { ATeamComponent } from './a-team/a-team.component';
 import { InMemoryWebApiModule } from 'angular-in-memory-web-api';
 import { SharedModule } from './shared/shared.module';
 import { HttpClientModule } from '@angular/common/http';
-import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [
@@ -23,17 +23,13 @@ import { RouterModule } from '@angular/router';
   ],
   imports: [
     SharedModule,
+    HttpClientModule,
+    InMemoryWebApiModule.forRoot(FilmData, { delay: 1000 }),
     FilmModule,
     UserModule,
     MessageModule,
-    HttpClientModule,
-    InMemoryWebApiModule.forRoot(FilmData, { delay: 1000 }),
-    RouterModule.forRoot([
-      { path: 'welcome', component: ATeamComponent },
-      { path: '', redirectTo: 'welcome', pathMatch: 'full' },
-      { path: '**', component: PageNotFoundComponent }
-    ]),
-    BrowserModule
+    BrowserModule,
+    AppRoutingModule
   ],
   providers: [FilmService, MessageService],
   bootstrap: [AppComponent]

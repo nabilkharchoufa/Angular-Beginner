@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
 
@@ -10,7 +11,7 @@ export class LoginComponent {
   errorMessage: string;
   pageTitle = 'Log In';
 
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService, private router: Router) { }
 
   login(loginForm: NgForm) {
     if (loginForm && loginForm.valid) {
@@ -18,7 +19,7 @@ export class LoginComponent {
       const password = loginForm.form.value.password;
       this.authService.login(userName, password);
 
-      // Navigate to the Product List page after log in.
+      this.router.navigate(['/films']);
     } else {
       this.errorMessage = 'Please enter a user name and password.';
     }

@@ -46,16 +46,16 @@
       </div>
 
       <div class="form-group row mb-2">
-        <div class="col-md-4">
-          <button class="btn btn-primary mr-3" style="width:80px" type="button"
+        <div class="col-md-12">
+          <button class="btn btn-primary mr-3" style="width:120px" type="button"
             [title]="filmForm.valid ? 'Enregistrer vos données' : 'Validater tous les champs'"
             [disabled]="!filmForm.valid" (click)="saveFilm()">
             Enregistrer
           </button>
-          <button class="btn btn-outline-secondary mr-3" style="width:80px" type="button" title="Annuler les modifications">
+          <button class="btn btn-outline-secondary mr-3" style="width:100px" type="button" title="Annuler les modifications">
             Annuler
           </button>
-          <button class="btn btn-outline-warning" style="width:80px" type="button" title="Supprimer ce film"
+          <button class="btn btn-outline-warning" style="width:100px" type="button" title="Supprimer ce film"
             (click)="deleteFilm()">
             Supprimer
           </button>

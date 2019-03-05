@@ -1,3 +1,4 @@
+import { ActivatedRoute, Router } from '@angular/router';
 import { FilmService } from './../film.service';
 import { Film } from './../film';
 import { Component, OnInit } from '@angular/core';
@@ -8,20 +9,32 @@ import { MessageService } from 'src/app/messages/message.service';
   templateUrl: './edit-film.component.html',
   styleUrls: ['./edit-film.component.css']
 })
-export class EditFilmComponent {
+export class EditFilmComponent implements OnInit{
   pageTitle = 'Modification de film';
   errorMessage: string;
 
   film: Film;
 
   constructor(private filmService: FilmService,
-              private messageService: MessageService) { }
+              private messageService: MessageService,
+              private route: ActivatedRoute,
+              private router: Router) { }
+
+  ngOnInit(): void {
+    // TODO UNSUBSCRIBE
+    this.route.paramMap.subscribe(
+      params => {
+        const id = +params.get('id');
+        this.getFilm(id);
+      }
+    );
+  }
 
   getFilm(id: number): void {
     this.filmService.getFilm(id)
       .subscribe(
         (film: Film) => this.onFilmRetrieved(film),
-        (error: any) => this.errorMessage = <any>error
+        (error: any) => this.errorMessage =  error as any
       );
   }
 
@@ -48,7 +61,7 @@ export class EditFilmComponent {
         this.filmService.deleteFilm(this.film.id)
           .subscribe(
             () => this.onSaveComplete(`${this.film.filmName} a été supprimé, j'espère que vous savez ce que vous faites`),
-            (error: any) => this.errorMessage = <any>error
+            (error: any) => this.errorMessage =  error as any
           );
       }
     }
@@ -60,13 +73,13 @@ export class EditFilmComponent {
         this.filmService.createFilm(this.film)
           .subscribe(
             () => this.onSaveComplete(`The new ${this.film.filmName} was saved`),
-            (error: any) => this.errorMessage = <any>error
+            (error: any) => this.errorMessage =  error as any
           );
       } else {
         this.filmService.updateFilm(this.film)
           .subscribe(
             () => this.onSaveComplete(`The updated ${this.film.filmName} was saved`),
-            (error: any) => this.errorMessage = <any>error
+            (error: any) => this.errorMessage =  error as any
           );
       }
     } else {
@@ -79,6 +92,7 @@ export class EditFilmComponent {
       this.messageService.addMessage(message);
     }
 
+    this.router.navigate(['/films']);
     // Navigate back to the film list
   }
 }

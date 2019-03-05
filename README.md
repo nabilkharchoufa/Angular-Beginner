@@ -155,4 +155,210 @@ imports: [
   ],
 ```
 
+Angular routing step-03 routage avec paramétres
+===============================================
 
+- - - - 
+
+###Contenu du step ###
+ - Required Parameters
+ - Optional parameters
+ - Query parameters
+
+###Required Parameters ###
+
+Dans le fichier app.module.ts ajouter les routes pour afficher le détail et la modification
+Faite attention à la nommenctlature, nous les avons regroupés par 'films' ...
+
+```Javascript 
+const ROUTES = [
+  { path: 'films', component: FilmsComponent },
+  { path: 'films/:id', component: FilmDetailComponent },
+  { path: 'films/:id/edit', component: EditFilmComponent },
+];
+
+@NgModule({
+  imports: [
+    SharedModule,
+    RouterModule.forChild(ROUTES)
+  ],
+  declarations: [
+    FilmsComponent,
+    FilmDetailComponent,
+    EditFilmComponent
+  ]
+})
+export class FilmModule { }
+```
+Maintenant on va activer les routes dans le html :
+
+```html
+<a [routerLink]="['/films',film.id]">
+  {{ film.filmName }}
+</a>
+.......................
+<button class="btn btn-outline-primary btn-sm" [routerLink]="['/films',film.id,'edit']">
+  Modifier
+</button>
+```
+
+Puisque c'est une petite application on se mettre d'accord que l'url de modification avec l'id 0 est pour la création (c'est pas propre je sais :))
+
+```html
+<li class="nav-item">
+  <a class="nav-link" [routerLink]="['/films/', 0, 'edit']">Ajouter un film</a>
+</li>
+```
+
+On atterrit sur les pages détail et modification mais on n'a pas encore fait le traitement nécessaire pour aficher le film .
+
+* Manipuler les URLS
+
+Service ActivatedRoute  :
+ - Url segments
+ - Route parameters
+ - Query parameters
+ - Resolver data
+ - ............
+
+D'abors il faut utiliser le service ActivatedRoute dans le component pour qu'on puisse récupérer l'id du film et le choisir dans le tableau
+
+```javascript
+constructor(private route: ActivatedRoute) { }
+```
+
+Deux façon de récupérer l'id 
+
+ - Snapshot : Récupérer l'id une seule fois
+ ```javascript 
+ const id = this.route.snapshot.paramMap.get('id');
+ ```
+ - Observable : mettre un watch pour observer l'id à chaque changement 
+ ```javascript 
+this.route.paramMap.subscribe(
+  params => {
+    const id = params.get('id');
+  }
+);
+ ```
+
+* Approche Snapshot
+ 
+
+ Dans le component de détail du film On va essayer de mettre un console.log dans le constructeur pour afficher l'id.
+
+ ```javascript : 
+    constructor(private filmService: FilmService, private route: ActivatedRoute) {}
+
+  ngOnInit(): void {
+    // Le plus c'est pour le caster en number
+    const id = +this.route.snapshot.paramMap.get('id');
+    console.log('id du film : ', id);
+  }
+
+  ```
+Normalement on doit avoir dans la console le film choisit.
+
+On utilise le id comme parametre pour récupérer le film : 
+
+
+ ```javascript : 
+    constructor(private filmService: FilmService, private route: ActivatedRoute) {}
+
+  ngOnInit(): void {
+    // Le + c'est pour le caster en number
+    const id = +this.route.snapshot.paramMap.get('id');
+     this.getFilm(id);
+  }
+  ```
+rafrachissez la page et bingo ça marche on a le détail du film 
+
+on va implémenter la redirection des bouton retour et modifier dans le détail 
+
+```html 
+<button class="btn btn-outline-secondary mr-3" style="width:160px" [routerLink]="['/films']">
+  <i class="fa fa-chevron-left"></i> Retour
+</button>
+<button class="btn btn-outline-primary" style="width:160px" [routerLink]="['/films',film.id,'edit']">
+  Modifier
+</button>
+```
+
+On fait la même chose pour la page de modification
+Tester l'ajout de film...
+Bien sûr que ça marche aussi ;-) 
+
+* Récupérer l'id avec l'approche observable
+
+remplacer la déclaration avec snapshot par le code suivants  
+
+
+```javascript
+    // TODO UNSUBSCRIBE
+    this.route.paramMap.subscribe(
+      params => {
+        const id = +params.get('id');
+        this.getFilm(id);
+      }
+    );
+```
+Ajouter la redirection à la fin de l'enregistrement 
+
+```javascript
+  onSaveComplete(message?: string): void {
+    if (message) {
+      this.messageService.addMessage(message);
+    }
+    this.router.navigate(['/films']);
+    // Navigate back to the film list
+  }
+```
+
+###Optional parameters####
+  on va pas le faire sur l'application mais voilà à quoi ça ressemble :
+
+```html
+<a  [routerLink]="['/films', {name: filmName, code: filmCode,
+  startDate: availabilityStart, endDate: availabilityEnd}]">
+```
+
+Pour la lecture des paramètres optionnel on procéde comme ça : 
+```javascript
+import { ActivatedRoute } from '@angular/router';
+.....
+constructor(private route: ActivatedRoute) {
+console.log(this.route.snapshot.paramMap.get('name'));
+console.log(this.route.snapshot.paramMap.get('code'));
+}
+```
+###Query Parameters###
+
+Pour utiliser les query params on va faire l'excercice en gardant les valeur d'input text de filtre et l'affichage d'image dans les query params 
+
+modifier la redirection vers le détail 
+
+```html
+ <a [routerLink]="['/films',film.id]"
+      [queryParams]="{filterBy : listFilter, showImage: showImage}"
+  >
+```
+
+faisant le test on voit que les valeur sont dans l'url qu'on arrive sur le détail mais une fois on appui sur le retour on les perds pour les garder on va modifier le redirection de retour sur le détail :
+
+```html
+<button class="btn btn-outline-secondary mr-3" style="width:160px" [routerLink]="['/films']"  queryParamsHandling="preserve">
+  <i class="fa fa-chevron-left"></i> Retour
+</button>
+```
+queryParamsHandling prend comme valeur 'preserve', 'merge', etc.
+
+* Accéder aux query params 
+
+Pour utiliser les infos qu'on a gardé dans l'url avec queryParamsHandling, on doit lire les queryParams, allez courage on est presque pour terminer le step :) 
+
+Dans le ngOnInit du component films on va récupérer les valeurs en utilisant le queryParamMap 
+
+```javascript
+this._listFilter = this.route.snapshot.queryParamMap.get('filterBy');
+this.showImage = JSON.parse(this.route.snapshot.queryParamMap.get('showImage'))
+````

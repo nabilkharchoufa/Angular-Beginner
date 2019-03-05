@@ -1,3 +1,4 @@
+import { ActivatedRoute } from '@angular/router';
 import { FilmService } from './film.service';
 import { Component, OnInit } from '@angular/core';
 import {Film} from './film';
@@ -28,9 +29,13 @@ export class FilmsComponent implements OnInit {
   filteredFilms: Film[] = [];
   films: Film[] = [];
 
-  constructor(private filmService: FilmService) { }
+  constructor(private filmService: FilmService, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
+
+    this._listFilter = this.route.snapshot.queryParamMap.get('filterBy');
+    this.showImage = JSON.parse(this.route.snapshot.queryParamMap.get('showImage'));
+
     this.filmService.getFilms().subscribe(
       films => {
         this.films = films;

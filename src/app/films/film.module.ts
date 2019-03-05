@@ -1,3 +1,4 @@
+import { FilmDetailComponent } from './film-detail.component';
 import { RouterModule } from '@angular/router';
 import { EditFilmComponent } from './edit-film/edit-film.component';
 import { FilmsComponent } from './films.component';
@@ -14,6 +15,7 @@ import { SharedModule } from '../shared/shared.module';
   ],
   declarations: [
     FilmsComponent,
+    FilmDetailComponent,
     EditFilmComponent
   ]
 })

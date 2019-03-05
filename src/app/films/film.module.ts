@@ -6,12 +6,16 @@ import { NgModule } from '@angular/core';
 
 import { SharedModule } from '../shared/shared.module';
 
+const ROUTES = [
+  { path: 'films', component: FilmsComponent },
+  { path: 'films/:id', component: FilmDetailComponent },
+  { path: 'films/:id/edit', component: EditFilmComponent },
+];
+
 @NgModule({
   imports: [
     SharedModule,
-    RouterModule.forChild([
-    {path: 'films', component: FilmsComponent}
-    ])
+    RouterModule.forChild(ROUTES)
   ],
   declarations: [
     FilmsComponent,

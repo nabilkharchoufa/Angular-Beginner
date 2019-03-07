@@ -361,4 +361,27 @@ Dans le ngOnInit du component films on va récupérer les valeurs en utilisant l
 ```javascript
 this._listFilter = this.route.snapshot.queryParamMap.get('filterBy');
 this.showImage = JSON.parse(this.route.snapshot.queryParamMap.get('showImage'))
-````
+```
+
+Angular routing step-04 Prefetching Data Using Route Resolvers
+==============================================================
+
+- - - - 
+
+Les avantages : 
+  - éviter d'afficher une page vide avant le chargement de données
+  - Réutilisation de code
+  - Gestion d'erreur meilleur
+
+
+###Contenu du step ###
+
+  - Providing Data with a Route
+  - Using a Route Resolver
+  - Building a Route Resolver Service
+  - Adding a Resolver to a Route
+  - Configuration
+  - Reading Resolver Data - Snapshot
+  - Reading Resolver Data - Observable
+
+###Providing Data with a Route###

@@ -384,4 +384,111 @@ Les avantages :
   - Reading Resolver Data - Snapshot
   - Reading Resolver Data - Observable
 
-###Providing Data with a Route###
+###Building a Route Resolver Service###
+
+On va commencer par créer un film resolver pour récupérer le film avant l'affichage du film
+
+"film-resolver.service.ts"
+```javascript
+import { Injectable } from '@angular/core';
+import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { FilmResolved } from './film';
+import { FilmService } from './film.service';
+@Injectable({
+  providedIn: 'root'
+})
+export class FilmResolver implements Resolve<FilmResolved> {
+  constructor(private filmService: FilmService) { }
+  resolve(route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot): Observable<FilmResolved> {
+    const id = route.paramMap.get('id');
+    if (isNaN(+id)) {
+      const message = `id du film c'est pas un id valid : ${id}`;
+      console.error(message);
+      return of({ film: null, error: message });
+    }
+
+    return this.filmService.getFilm(+id)
+      .pipe(
+        map(film => ({ film: film })),
+        catchError(error => {
+          const message = `error: ${error}`;
+          console.error(message);
+          return of({ film: null, error: message });
+        })
+      );
+  }
+
+}
+```
+
+###Adding a Resolver to a Route###
+
+On modifie le routage pour utiliser le resolver qu'on a crée 
+
+```javascript
+const ROUTES = [
+  { path: 'films', component: FilmsComponent },
+  {
+    path: 'films/:id',
+    component: FilmDetailComponent,
+    resolve: { ResolvedData: FilmResolver }
+  },
+  {
+    path: 'films/:id/edit',
+    component: EditFilmComponent,
+    resolve: {ResolvedData: FilmResolver}
+  },
+];
+```
+
+###Reading resolver data: snapshot ###
+
+  Dans les fichiers film-detail.component.ts et edit-film.component.ts changez la façon dont on récupére le film : 
+
+```javascript
+  constructor(private filmService: FilmService, private route: ActivatedRoute) {}
+
+  ngOnInit(): void {
+    this.route.data.subscribe(data => {
+      const filmResolved: FilmResolved = data['film'];
+      this.errorMessage = filmResolved.error;
+      this.onFilmRetrieved(filmResolved.film);
+    });
+  }
+```
+
+testez...
+
+Essayez de tester avec un id qui n'existe pas, vous allez voir notre message d'erreur initialisé par le resolver
+
+Tous les components partage la même référence d'objet "film" et vous avez remarquez qu'il n'y a plus de chargement partiel (y) enjoy-it :)
+
+Il y a un problème, vous l'avez vu, non ? si on appui sur ajouter un film la méthode onInit ne va pas s'excuter une deuxième fois qu'on est déjà sur la page edit film
+
+alors pour remédier à ce problème on va utiliser les observables :
+
+```javascript
+  constructor(private filmService: FilmService, private route: ActivatedRoute) {}
+
+  ngOnInit(): void {
+    this.route.data.subscribe(data => {
+      const filmResolved: FilmResolved = data['film'];
+      this.errorMessage = filmResolved.error;
+      this.onFilmRetrieved(filmResolved.film);
+    });
+  }
+```
+
+ça fonctionne de nouveau (y), on maintient le cap ....
+
+
+
+
+
+
+
+
+

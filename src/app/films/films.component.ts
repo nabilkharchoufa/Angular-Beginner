@@ -1,7 +1,7 @@
 import { ActivatedRoute } from '@angular/router';
 import { FilmService } from './film.service';
 import { Component, OnInit } from '@angular/core';
-import {Film} from './film';
+import { Film } from './film';
 
 
 @Component({
@@ -18,23 +18,26 @@ export class FilmsComponent implements OnInit {
   errorMessage = '';
 
   _listFilter = '';
+
+  filteredFilms: Film[] = [];
+  films: Film[] = [];
+
   get listFilter(): string {
     return this._listFilter;
   }
+
   set listFilter(value: string) {
     this._listFilter = value;
     this.filteredFilms = this.listFilter ? this.performFilter(this.listFilter) : this.films;
   }
 
-  filteredFilms: Film[] = [];
-  films: Film[] = [];
 
   constructor(private filmService: FilmService, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
 
-    this._listFilter = this.route.snapshot.queryParamMap.get('filterBy');
-    this.showImage = JSON.parse(this.route.snapshot.queryParamMap.get('showImage'));
+    this._listFilter = this.route.snapshot.queryParamMap.get('filterBy') || '';
+    this.showImage = this.route.snapshot.queryParamMap.get('showImage') === 'true';
 
     this.filmService.getFilms().subscribe(
       films => {

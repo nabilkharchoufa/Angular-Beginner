@@ -1,3 +1,4 @@
+import { FilmResolver } from './film-resolver.service';
 import { FilmDetailComponent } from './film-detail.component';
 import { RouterModule } from '@angular/router';
 import { EditFilmComponent } from './edit-film/edit-film.component';
@@ -8,8 +9,16 @@ import { SharedModule } from '../shared/shared.module';
 
 const ROUTES = [
   { path: 'films', component: FilmsComponent },
-  { path: 'films/:id', component: FilmDetailComponent },
-  { path: 'films/:id/edit', component: EditFilmComponent },
+  {
+    path: 'films/:id',
+    component: FilmDetailComponent,
+    resolve: { film: FilmResolver }
+  },
+  {
+    path: 'films/:id/edit',
+    component: EditFilmComponent,
+    resolve: { film: FilmResolver }
+  },
 ];
 
 @NgModule({

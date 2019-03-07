@@ -1,6 +1,6 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { FilmService } from './../film.service';
-import { Film } from './../film';
+import { Film, FilmResolved } from './../film';
 import { Component, OnInit } from '@angular/core';
 import { MessageService } from 'src/app/messages/message.service';
 
@@ -13,6 +13,7 @@ export class EditFilmComponent implements OnInit{
   pageTitle = 'Modification de film';
   errorMessage: string;
 
+
   film: Film;
 
   constructor(private filmService: FilmService,
@@ -21,13 +22,11 @@ export class EditFilmComponent implements OnInit{
               private router: Router) { }
 
   ngOnInit(): void {
-    // TODO UNSUBSCRIBE
-    this.route.paramMap.subscribe(
-      params => {
-        const id = +params.get('id');
-        this.getFilm(id);
-      }
-    );
+    this.route.data.subscribe(data => {
+      const filmResolved: FilmResolved = data['film'];
+      this.errorMessage = filmResolved.error;
+      this.onFilmRetrieved(filmResolved.film);
+    });
   }
 
   getFilm(id: number): void {

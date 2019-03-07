@@ -36,8 +36,9 @@ export class FilmsComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this._listFilter = this.route.snapshot.queryParamMap.get('filterBy') || '';
-    this.showImage = this.route.snapshot.queryParamMap.get('showImage') === 'true';
+    const filterBy = this.route.snapshot.queryParamMap.get('filterBy');
+    this._listFilter = filterBy ? filterBy: '' ;
+    this.showImage = JSON.parse(this.route.snapshot.queryParamMap.get('showImage'));
 
     this.filmService.getFilms().subscribe(
       films => {

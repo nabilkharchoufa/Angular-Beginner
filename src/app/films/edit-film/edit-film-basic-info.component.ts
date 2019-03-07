@@ -1,20 +1,30 @@
+import { FilmService } from './../film.service';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgForm } from '@angular/forms';
-
-import { Film } from '../film';
+import { Film, FilmResolved } from '../film';
 
 @Component({
   templateUrl: './edit-film-basic-info.component.html'
 })
-export class FilmEditBasicInfoComponent implements OnInit {
+export class EditFilmBasicInfoComponent implements OnInit {
   @ViewChild(NgForm) filmForm: NgForm;
 
   errorMessage: string;
-  film = { id: 1, filmName: 'test', filmCode: 'test' };
+  film: Film;
 
-  constructor(private route: ActivatedRoute) { }
+  constructor(private route: ActivatedRoute, private filmService: FilmService) { }
 
   ngOnInit(): void {
+    // TODO UNSUBSCRIBE
+    this.route.parent.data.subscribe(data => {
+      if (this.filmForm){
+        this.filmForm.reset();
+      }
+      const filmResolved: FilmResolved = data['film'];
+      this.errorMessage = filmResolved.error;
+      this.film = filmResolved.film;
+    });
   }
+
 }

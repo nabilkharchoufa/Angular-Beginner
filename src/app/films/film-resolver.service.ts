@@ -18,7 +18,7 @@ export class FilmResolver implements Resolve<FilmResolved> {
     state: RouterStateSnapshot): Observable<FilmResolved> {
     const id = route.paramMap.get('id');
     if (isNaN(+id)) {
-      const message = `id du film c'est pas un id valid : ${id}`;
+      const message = `id du film c'est pas numéro : ${id}`;
       console.error(message);
       return of({ film: null, error: message });
     }

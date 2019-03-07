@@ -449,15 +449,13 @@ const ROUTES = [
   Dans les fichiers film-detail.component.ts et edit-film.component.ts changez la façon dont on récupére le film : 
 
 ```javascript
-  constructor(private filmService: FilmService, private route: ActivatedRoute) {}
-
-  ngOnInit(): void {
-    this.route.data.subscribe(data => {
-      const filmResolved: FilmResolved = data['film'];
-      this.errorMessage = filmResolved.error;
-      this.onFilmRetrieved(filmResolved.film);
-    });
+  constructor(private filmService: FilmService, private route: ActivatedRoute) {
+    const filmResolved: FilmResolved = this.route.snapshot.data['film'];
+    this.errorMessage = filmResolved.error;
+    this.onFilmRetrieved(filmResolved.film);
   }
+
+  ngOnInit(): void {}
 ```
 
 testez...
@@ -470,20 +468,219 @@ Il y a un problème, vous l'avez vu, non ? si on appui sur ajouter un film la m�
 
 alors pour remédier à ce problème on va utiliser les observables :
 
-```javascript
-  constructor(private filmService: FilmService, private route: ActivatedRoute) {}
 
-  ngOnInit(): void {
-    this.route.data.subscribe(data => {
-      const filmResolved: FilmResolved = data['film'];
-      this.errorMessage = filmResolved.error;
-      this.onFilmRetrieved(filmResolved.film);
-    });
-  }
+Angular routing step-05 child route
+===============================================
+
+- - - - 
+
+Parmis les cas d'utilisation de child step on trouve :
+  - Tabbed pages
+  - Master/detail layouts
+  - Embedded templates
+  - Feature modules
+  - Lazy loading
+
+###Contenu du step ###
+  - Using Child Routes
+  - Configuring Child Routes
+  - Placing the Child View
+  - Activating Child Routes
+  - Obtaining Data for Child Routes
+  - Validating Across Child Routes
+
+###Configuring Child Routes ###
+
+On commence par configurer les routes dans le films.module.ts
+
+```javascript
+const ROUTES = [
+  { path: 'films', component: FilmsComponent },
+  { path: 'films/:id', component: FilmDetailComponent },
+  {
+    path: 'films/:id/edit',
+    component: EditFilmComponent,
+    children: [
+      {
+        path: '', redirectTo: 'info', pathMatch: 'full'
+      },
+      {
+        path: 'info', component: FilmEditBasicInfoComponent
+      },
+      {
+        path: 'acteurs', component: FilmEditActeursComponent
+      }
+    ]
+  },
+];
+
+.................
+
+declarations: [
+    FilmsComponent,
+    FilmDetailComponent,
+    EditFilmComponent,
+    FilmEditBasicInfoComponent,
+    FilmEditActeursComponent
+  ]
+
 ```
 
-ça fonctionne de nouveau (y), on maintient le cap ....
+###Placing the Child View ###
 
+Modifier le html de modification pour avoir deux tabs infos et acteurs 
+
+```html
+<div class="card-body">
+  <div class="wizard">
+      <a [routerLink]="['info']">
+        infos
+      </a>
+      <a [routerLink]="['acteurs']">
+        acteurs
+      </a>
+  </div>
+<router-outlet></router-outlet>
+</div>
+```
+
+###Activating Child Routes ###
+Il existe deux façon d'activer les routes :
+
+modifier les url dans les tabs de la page modification de film 
+  - Absolute path : 
+```html 
+    <a [routerLink]="['/films', film.id, 'edit', 'info']">Info</a> 
+```
+  - Relative path
+```html 
+    <a [routerLink]="['info']">Info</a> 
+```
+le html de edit film il va ressembler à ça 
+```html
+<div class="card-body">
+    <div class="wizard">
+      <a [routerLink]="['info']">
+        infos
+      </a>
+      <a [routerLink]="['acteurs']">
+        acteurs
+      </a>
+    </div>
+    <router-outlet></router-outlet>
+    <div class="col-md-12">
+      <button class="btn btn-primary mr-3" style="width:120px" type="button"
+        [title]="'Enregistrer vos données'"
+        (click)="saveFilm()">
+        Enregistrer
+      </button>
+      <button class="btn btn-outline-secondary mr-3" style="width:100px" type="button"
+        title="Annuler les modifications">
+        Annuler
+      </button>
+      <button class="btn btn-outline-warning" style="width:100px" type="button" title="Supprimer ce film"
+        (click)="deleteFilm()">
+        Supprimer
+      </button>
+    </div>
+  </div>
+```
+###Obtaining Data for a Child Route ###
+
+Maintenat on essayer de récupérer le vrai objet film: il y a moyens :
+
+  - Film Data Service
+```javascript 
+this.filmService.getFilm(id)
+.subscribe(film => this.film = film);
+```
+  - Child Route Resolver : Récuperer le film avant de charger le child route 
+```javascript 
+this.film = this.route.snapshot.data['film'];
+```
+  - Parent Route Resolver: le component parent utilise le même objet film 
+```javascript 
+this.film = this.route.parent.snapshot.data['film'];
+```
+
+Pour commencer on va modifier le EditFilmBasicInfoComponent pour récupérer l'objet film 
+
+```javascript
+  ngOnInit(): void {
+    this.route.parent.data.subscribe(data => {
+      const filmResolved: FilmResolved = data['film'];
+      this.errorMessage = filmResolved.error;
+      this.film = filmResolved.film;
+    });
+  }
+
+```
+Faites la même chose pour l'onglet acteurs
+
+Nous avons pas encore finit, la validation des champs n'est pas bien fait surtout si on passe de la modification à la création on a toujours les erreurs de modification affiché 
+
+On va utiliser le filmForm pour initialiser l'objet chaque fois qu'on a un nouveau objet film 
+```javascript
+  ngOnInit(): void {
+    // TODO UNSUBSCRIBE
+    this.route.parent.data.subscribe(data => {
+      ////////////////////////////////
+      if (this.filmForm){
+        this.filmForm.reset();
+      }
+      ////////////////////////////////
+      const filmResolved: FilmResolved = data['film'];
+      this.errorMessage = filmResolved.error;
+      this.film = filmResolved.film;
+    });
+  }
+
+```
+
+Maintenant on va essayer d'enregistrer sans saisir le code de film, Oups, ça a passé, on devrait désactiver si le formulaire n'est pas vide, oui je sais les boutons sont dans l'élement parent. 
+
+Pour cela on va ajouter des fonctions de validation dans le component edit-film.component.ts
+
+```javascript
+
+  isValid(path?: string): boolean {
+    this.validate();
+
+    // dans le cas où on veut faire la validation seulement pour un onglet 
+    if (path) {
+      return this.dataIsValid[path];
+    }
+    //Dans le cas où il y a +++ tabs
+    return this.dataIsValid && Object.keys(this.dataIsValid).every(d => this.dataIsValid[d] === true);
+  }
+
+  validate(): void {
+    this.dataIsValid = {};
+
+    // tabs info
+    if (this.film.filmName && this.film.filmCode && this.film.filmCode.length != 4) {
+      this.dataIsValid['info'] = true;
+    } else {
+      this.dataIsValid['info'] = false;
+    }
+    // tabs acteurs
+    if (this.film.acteurs && this.film.acteurs.length > 0) {
+      this.dataIsValid['acteurs'] = true;
+    } else {
+      this.dataIsValid['acteurs'] = false;
+    }
+  }
+```
+et dans le html on va désactiver le bouton tant que le form n'est pas valid 
+
+```html
+<button class="btn btn-primary mr-3" style="width:120px" type="button"
+  [title]="'Enregistrer vos données'"
+  [disabled]="!isValid()"
+  (click)="saveFilm()">
+  Enregistrer
+</button>
+```      
 
 
 

@@ -1,4 +1,5 @@
-import { FilmResolver } from './film-resolver.service';
+import { EditFilmActeursComponent } from './edit-film/edit-film-acteurs.component';
+import { EditFilmBasicInfoComponent } from './edit-film/edit-film-basic-info.component';
 import { FilmDetailComponent } from './film-detail.component';
 import { RouterModule } from '@angular/router';
 import { EditFilmComponent } from './edit-film/edit-film.component';
@@ -6,6 +7,7 @@ import { FilmsComponent } from './films.component';
 import { NgModule } from '@angular/core';
 
 import { SharedModule } from '../shared/shared.module';
+import { FilmResolver } from './film-resolver.service';
 
 const ROUTES = [
   { path: 'films', component: FilmsComponent },
@@ -17,7 +19,18 @@ const ROUTES = [
   {
     path: 'films/:id/edit',
     component: EditFilmComponent,
-    resolve: { film: FilmResolver }
+    resolve: { film: FilmResolver },
+    children: [
+      {
+        path: '', redirectTo: 'info', pathMatch: 'full'
+      },
+      {
+        path: 'info', component: EditFilmBasicInfoComponent
+      },
+      {
+        path: 'acteurs', component: EditFilmActeursComponent
+      }
+    ]
   },
 ];
 
@@ -29,7 +42,9 @@ const ROUTES = [
   declarations: [
     FilmsComponent,
     FilmDetailComponent,
-    EditFilmComponent
+    EditFilmComponent,
+    EditFilmBasicInfoComponent,
+    EditFilmActeursComponent
   ]
 })
 export class FilmModule { }

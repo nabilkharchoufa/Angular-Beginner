@@ -9,17 +9,16 @@ import { MessageService } from 'src/app/messages/message.service';
   templateUrl: './edit-film.component.html',
   styleUrls: ['./edit-film.component.css']
 })
-export class EditFilmComponent implements OnInit{
+export class EditFilmComponent implements OnInit {
   pageTitle = 'Modification de film';
   errorMessage: string;
-
-
   film: Film;
+  private dataIsValid: { [key: string]: boolean } = {};
 
   constructor(private filmService: FilmService,
-              private messageService: MessageService,
-              private route: ActivatedRoute,
-              private router: Router) { }
+    private messageService: MessageService,
+    private route: ActivatedRoute,
+    private router: Router) { }
 
   ngOnInit(): void {
     this.route.data.subscribe(data => {
@@ -33,7 +32,7 @@ export class EditFilmComponent implements OnInit{
     this.filmService.getFilm(id)
       .subscribe(
         (film: Film) => this.onFilmRetrieved(film),
-        (error: any) => this.errorMessage =  error as any
+        (error: any) => this.errorMessage = error as any
       );
   }
 
@@ -60,25 +59,25 @@ export class EditFilmComponent implements OnInit{
         this.filmService.deleteFilm(this.film.id)
           .subscribe(
             () => this.onSaveComplete(`${this.film.filmName} a été supprimé, j'espère que vous savez ce que vous faites`),
-            (error: any) => this.errorMessage =  error as any
+            (error: any) => this.errorMessage = error as any
           );
       }
     }
   }
 
   saveFilm(): void {
-    if (true === true) {
+    if (this.isValid()) {
       if (this.film.id === 0) {
         this.filmService.createFilm(this.film)
           .subscribe(
             () => this.onSaveComplete(`The new ${this.film.filmName} was saved`),
-            (error: any) => this.errorMessage =  error as any
+            (error: any) => this.errorMessage = error as any
           );
       } else {
         this.filmService.updateFilm(this.film)
           .subscribe(
             () => this.onSaveComplete(`The updated ${this.film.filmName} was saved`),
-            (error: any) => this.errorMessage =  error as any
+            (error: any) => this.errorMessage = error as any
           );
       }
     } else {
@@ -93,5 +92,30 @@ export class EditFilmComponent implements OnInit{
 
     this.router.navigate(['/films']);
     // Navigate back to the film list
+  }
+
+  isValid(path?: string): boolean {
+    this.validate();
+    if (path) {
+      return this.dataIsValid[path];
+    }
+    return this.dataIsValid && Object.keys(this.dataIsValid).every(d => this.dataIsValid[d] === true);
+  }
+
+  validate(): void {
+    this.dataIsValid = {};
+
+    // tabs info
+    if (this.film.filmName && this.film.filmCode && this.film.filmCode.length != 4) {
+      this.dataIsValid['info'] = true;
+    } else {
+      this.dataIsValid['info'] = false;
+    }
+    // tabs acteurs
+    if (this.film.acteurs && this.film.acteurs.length > 0) {
+      this.dataIsValid['acteurs'] = true;
+    } else {
+      this.dataIsValid['acteurs'] = false;
+    }
   }
 }

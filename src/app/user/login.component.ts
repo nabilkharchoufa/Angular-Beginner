@@ -18,8 +18,9 @@ export class LoginComponent {
       const userName = loginForm.form.value.userName;
       const password = loginForm.form.value.password;
       this.authService.login(userName, password);
+      console.log(this.authService.urlDestination);
 
-      this.router.navigate(['/films']);
+      this.router.navigate([this.authService.urlDestination || '/films' ]);
     } else {
       this.errorMessage = 'Please enter a user name and password.';
     }

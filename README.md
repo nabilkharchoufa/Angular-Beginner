@@ -682,10 +682,207 @@ et dans le html on va désactiver le bouton tant que le form n'est pas valid
 </button>
 ```      
 
+Angular routing step-06 Guards 
+==============================
 
+Depuis qu'on a commencé développé l'application vous vous posez la question quand on va ajouter la vérification de l'authentification, bah c'est maintenant ou jamais :-) 
 
+# Contenu du step #
 
+  - Using Route Guards
+  - canActivate Guard
+  - Sharing Data with a Guard
+  - canActivateChild Guard
+  - canDeactivate Guard
 
+Protéger les routes avec les Guards 
 
+  - canActivate : protége la route lors de la navigation 
+
+  - canActivateChild : protége child route lors de la navigation 
+
+  - canDeactivate : appelée quand on essaye de quitter la route 
+
+  - canLoad : Protéger un async route 
+
+  - resolve : Prefetch data avant d'activer la route 
+
+le workflow de guerds est le suivant  :
+* canDeactivate : vérifier avant de quitter la route 
+  * canLoad : vérifier est-ce qu'il a le droit de charger les données 
+    * canActivateChild : vérifier la route fille 
+      * canActivate : vérifier la route mère 
+        * resolve : charger les données après avoir être sûr de tout ce qu'on a checké ;-)
+
+# Créer un Guard service #
+
+Nous allons utilisé le angular cli pour générer un Guard, lancer la commande :
+```bash
+ng g g user/auth
+```
+Ensuite on va vérifer que l'utilisateur est connecté à l'aide de notre service auth.service.ts pour le laisser passer à /films sinon une redirection à la page login 
+
+```javascript
+  constructor(private authService: AuthService, private router: Router) { }
+
+  canActivate(
+    next: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    return this.checkIfUserisLogged();
+  }
+
+  checkIfUserisLogged(): boolean {
+    if (this.authService.isLoggedIn) {
+      return true;
+    } else {
+      this.router.navigate(['login']);
+      return false;
+    }
+  }
+```
+Nous allons faire une petite modification sur les routes pour les regrouper avec '/films' en utilisan children pour nous faciliter la vérification avec Guard 
+
+```javascript
+const ROUTES = [
+  {
+    path: 'films',
+    canActivate: [AuthGuard],
+    children: [
+      {
+        path: '',
+        component: FilmsComponent
+      },
+      {
+        path: ':id',
+        component: FilmDetailComponent,
+        resolve: { film: FilmResolver }
+      },
+      {
+        path: ':id/edit',
+        component: EditFilmComponent,
+        resolve: { film: FilmResolver },
+        children: [
+          {
+            path: '', redirectTo: 'info', pathMatch: 'full'
+          },
+          {
+            path: 'info', component: EditFilmBasicInfoComponent
+          },
+          {
+            path: 'acteurs', component: EditFilmActeursComponent
+          }
+        ]
+      }
+    ]
+  }
+];
+```
+Faisant un petit test, aha, on peut plus aller se balader dans l'application sans être connecté :) 
+
+Mais il y a un petit soucis, après authentification je suis redirigé vers la page de films alors que je voulais ajouter un film
+
+Je suis d'accord, parce que nous avons fait la redirection en dure aprés l'authentification
+
+pour remédier à ça on a besoin de partager l'url destionation avec les guards
+
+pour faire cela on a le resolver et les services 
+
+  - resolver c'est mort parce qu'il est appelé après les guards
+
+  - service : c'est possible puisque c'est un singleton 
+
+```javascript
+// service 
+export class AuthService {
+  currentUser: User;
+  ////////////////////////
+  urlDestination: string;
+  ////////////////////////  
+
+  ..................
+
+  // login component
+  
+  login(loginForm: NgForm) {
+    if (loginForm && loginForm.valid) {
+      const userName = loginForm.form.value.userName;
+      const password = loginForm.form.value.password;
+      this.authService.login(userName, password);
+      console.log(this.authService.urlDestination);
+      ////////////////////////////////////////////////////////////////////////////////////  
+      this.router.navigate([this.authService.urlDestination || '/films' ]);
+      ////////////////////////////////////////////////////////////////////////////////////  
+    } else {
+      this.errorMessage = 'Please enter a user name and password.';
+    }
+  }
+
+  // Auth guard
+
+    checkIfUserisLogged(url: string): boolean {
+    if (this.authService.isLoggedIn) {
+      return true;
+    } else {
+      //////////////////////////////////////////
+      this.authService.urlDestination = url;
+      //////////////////////////////////////////
+      this.router.navigate(['login']);
+      return false;
+    }
+  }
+
+```
+
+canActivated : ne va faire aucune vérification si on change que le child route, c'est pourquoi on a besoin de CanActivatedChild 
+
+CanActivatedChild fonctionne comme le canAcivated
+
+canDeactivete Guard : 
+  - vérifier s'il utilisateur a tout sauvegardé avant de quitter
+
+On va générer un nouveau guard :
+
+```bash
+ng g g films/edit-film/edit-film
+```
+
+Change l'implémentation
+
+```javascript
+////EditFilmGuard
+  canDeactivate(component: EditFilmComponent,
+                currentRoute: ActivatedRouteSnapshot,
+                currentState: RouterStateSnapshot,
+                nextState?: RouterStateSnapshot): boolean | Observable<boolean> | Promise<boolean> {
+    if(component.isDirty){
+      const filmName = component.film.filmName || "Nouveau film";
+      return confirm(`Vous êtes sûr de quitter, vous avez des modification non enregistré pour le film  ${filmName} ? `);
+    }
+    return true;
+  } 
+
+  /// vérification sur le component que l'objet film n'a pas été changé 
+  private originalFilm: Film;
+  private currentFilm: Film;
+  private dataIsValid: { [key: string]: boolean } = {};
+
+  get isDirty(): boolean {
+    return JSON.stringify(this.originalFilm) !==
+      JSON.stringify(this.currentFilm);
+  }
+
+// fonction appelé quand on fait réf à "this.film"
+  get film(): Film {
+    return this.currentFilm;
+  }
+//// fonction appelé quand on fait réf à "this.film = "
+  set film(value: Film) {
+    this.currentFilm = value;
+    this.originalFilm = { ...value };
+  }
+.............
+
+  // 
+```
 
 

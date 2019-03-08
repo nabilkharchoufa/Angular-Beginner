@@ -12,8 +12,23 @@ import { MessageService } from 'src/app/messages/message.service';
 export class EditFilmComponent implements OnInit {
   pageTitle = 'Modification de film';
   errorMessage: string;
-  film: Film;
+  private originalFilm: Film;
+  private currentFilm: Film;
   private dataIsValid: { [key: string]: boolean } = {};
+
+  get isDirty(): boolean {
+    return JSON.stringify(this.originalFilm) !==
+      JSON.stringify(this.currentFilm);
+  }
+
+  get film(): Film {
+    return this.currentFilm;
+  }
+
+  set film(value: Film) {
+    this.currentFilm = value;
+    this.originalFilm = { ...value };
+  }
 
   constructor(private filmService: FilmService,
     private messageService: MessageService,
@@ -22,7 +37,7 @@ export class EditFilmComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.data.subscribe(data => {
-      const filmResolved: FilmResolved = data['film'];
+      const filmResolved: FilmResolved = data.film;
       this.errorMessage = filmResolved.error;
       this.onFilmRetrieved(filmResolved.film);
     });
@@ -39,7 +54,7 @@ export class EditFilmComponent implements OnInit {
   onFilmRetrieved(film: Film): void {
     this.film = film;
 
-    if (!this.film) {
+    if (!this.currentFilm) {
       this.pageTitle = 'Aucun film';
     } else {
       if (this.film.id === 0) {
@@ -106,16 +121,16 @@ export class EditFilmComponent implements OnInit {
     this.dataIsValid = {};
 
     // tabs info
-    if (this.film.filmName && this.film.filmCode && this.film.filmCode.length != 4) {
-      this.dataIsValid['info'] = true;
+    if (this.film.filmName && this.film.filmCode && this.film.filmCode.length !== 4) {
+      this.dataIsValid.info = true;
     } else {
-      this.dataIsValid['info'] = false;
+      this.dataIsValid.info = false;
     }
     // tabs acteurs
     if (this.film.acteurs && this.film.acteurs.length > 0) {
-      this.dataIsValid['acteurs'] = true;
+      this.dataIsValid.acteurs = true;
     } else {
-      this.dataIsValid['acteurs'] = false;
+      this.dataIsValid.acteurs = false;
     }
   }
 }

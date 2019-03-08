@@ -1,3 +1,5 @@
+import { EditFilmGuard } from './edit-film/edit-film.guard';
+import { AuthGuard } from './../user/auth.guard';
 import { EditFilmActeursComponent } from './edit-film/edit-film-acteurs.component';
 import { EditFilmBasicInfoComponent } from './edit-film/edit-film-basic-info.component';
 import { FilmDetailComponent } from './film-detail.component';
@@ -10,28 +12,38 @@ import { SharedModule } from '../shared/shared.module';
 import { FilmResolver } from './film-resolver.service';
 
 const ROUTES = [
-  { path: 'films', component: FilmsComponent },
   {
-    path: 'films/:id',
-    component: FilmDetailComponent,
-    resolve: { film: FilmResolver }
-  },
-  {
-    path: 'films/:id/edit',
-    component: EditFilmComponent,
-    resolve: { film: FilmResolver },
+    path: 'films',
+    canActivate: [AuthGuard],
     children: [
       {
-        path: '', redirectTo: 'info', pathMatch: 'full'
+        path: '',
+        component: FilmsComponent
       },
       {
-        path: 'info', component: EditFilmBasicInfoComponent
+        path: ':id',
+        component: FilmDetailComponent,
+        resolve: { film: FilmResolver }
       },
       {
-        path: 'acteurs', component: EditFilmActeursComponent
+        path: ':id/edit',
+        component: EditFilmComponent,
+        resolve: { film: FilmResolver },
+        canDeactivate: [EditFilmGuard],
+        children: [
+          {
+            path: '', redirectTo: 'info', pathMatch: 'full'
+          },
+          {
+            path: 'info', component: EditFilmBasicInfoComponent
+          },
+          {
+            path: 'acteurs', component: EditFilmActeursComponent
+          }
+        ]
       }
     ]
-  },
+  }
 ];
 
 @NgModule({

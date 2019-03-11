@@ -1,0 +1,151 @@
+<div class="card">
+  <div class="card-header">
+    Inscription
+  </div>
+
+  <div class="card-body">
+    <form novalidate (ngSubmit)="save(signupForm)" #signupForm="ngForm">
+
+      <div class="form-group row mb-2">
+        <label class="col-md-2 col-form-label" for="firstNameId">Prénom</label>
+        <div class="col-md-8">
+          <input class="form-control" id="firstNameId" type="text" placeholder="Prénom (obligatoire)" required
+            minlength="3" [(ngModel)]=user.firstName name="firstName" #firstNameVar="ngModel"
+            [ngClass]="{'is-invalid': (firstNameVar.touched || firstNameVar.dirty) && !firstNameVar.valid }" />
+          <span class="invalid-feedback">
+            <span *ngIf="firstNameVar.errors?.required">
+              Le prénom est obligatoir.
+            </span>
+            <span *ngIf="firstNameVar.errors?.minlength">
+              le prénom doit contenir au minimum 3 caractères.
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <div class="form-group row mb-2">
+        <label class="col-md-2 col-form-label" for="lastNameId">Nom</label>
+        <div class="col-md-8">
+          <input class="form-control" id="lastNameId" type="text" placeholder="Nom (obligatoire)" required
+            maxlength="50" [(ngModel)]="user.lastName" name="lastName" #lastNameVar="ngModel"
+            [ngClass]="{'is-invalid': (lastNameVar.touched || lastNameVar.dirty) && !lastNameVar.valid }" />
+          <span class="invalid-feedback">
+            <span *ngIf="lastNameVar.errors?.required">
+              Le nom est obligatoir.
+            </span>
+            <span *ngIf="lastNameVar.errors?.maxlength">
+              le nom doit contenir au maximum 50 caractères.
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <div class="form-group row mb-2">
+        <label class="col-md-2 col-form-label" for="emailId">Email</label>
+        <div class="col-md-8">
+          <input class="form-control" id="emailId" type="email" placeholder="Email (required)" required email
+            [(ngModel)]="user.email" name="email" #emailVar="ngModel"
+            [ngClass]="{'is-invalid': (emailVar.touched || emailVar.dirty) && !emailVar.valid }" />
+          <span class="invalid-feedback">
+            <span *ngIf="emailVar.errors?.required">
+              Merci de saisir une adresse mail.
+            </span>
+            <span *ngIf="emailVar.errors?.email">
+              Merci de saisir une adresse mail valid.
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <div class="form-group row mb-2">
+        <div class="col-md-8">
+          <div class="form-check">
+            <label class="form-check-label">
+              <input class="form-check-input" id="sendCatalogId" type="checkbox" [(ngModel)]="user.sendCatalog"
+                name="sendCatalog"> Envoyer moi le catalogue
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="user.sendCatalog">
+        <div class="form-group row mb-2">
+          <label class="col-md-2 col-form-label pt-0">Type d'adresse</label>
+          <div class="col-md-8">
+            <div class="form-check form-check-inline">
+              <label class="form-check-label">
+                <input class="form-check-input" id="addressType1Id" type="radio" value="home"
+                  [(ngModel)]="user.addressType" name="addressType"> Domicile
+              </label>
+            </div>
+            <div class="form-check form-check-inline">
+              <label class="form-check-label">
+                <input class="form-check-input" id="addressType1Id" type="radio" value="work"
+                  [(ngModel)]="user.addressType" name="addressType"> Travail
+              </label>
+            </div>
+            <div class="form-check form-check-inline">
+              <label class="form-check-label">
+                <input class="form-check-input" id="addressType1Id" type="radio" value="other"
+                  [(ngModel)]="user.addressType" name="addressType"> Autre
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group row mb-2">
+          <label class="col-md-2 col-form-label" for="street1Id">Address</label>
+          <div class="col-md-8">
+            <input class="form-control" id="street1Id" type="text" placeholder="Adresse" [(ngModel)]="user.street1"
+              name="street1">
+          </div>
+        </div>
+
+        <div class="form-group row mb-2">
+          <label class="col-md-2 col-form-label" for="street2Id">Complément d'address</label>
+          <div class="col-md-8">
+            <input class="form-control" id="street2Id" type="text" placeholder="Complément d'address"
+              [(ngModel)]="user.street2" name="street2">
+          </div>
+        </div>
+
+        <div class="form-group row mb-2">
+          <label class="col-md-2 col-form-label" for="cityId">Ville, Régions, Code postale</label>
+          <div class="col-md-3">
+            <input class="form-control" id="cityId" type="text" placeholder="ville" [(ngModel)]="user.city" name="city">
+          </div>
+          <div class="col-md-3">
+            <select class="form-control" id="stateId" [(ngModel)]="user.state" name="state">
+              <option value="" disabled selected hidden>Selectionner une région...</option>
+              <option value="Al">Alsace, Champagne-Ardenne et Lorraine</option>
+              <option value="Aq">Aquitaine, Limousin et Poitou-Charentes</option>
+              <option value="Au">Auvergne et Rhône-Alpes</option>
+              <option value="Bo">Bourgogne et Franche Comté</option>
+              <option value="La">Languedoc-Roussillon et Midi-Pyrénées</option>
+              <option value="No">Nord-Pas-de-Calais et Picardie</option>
+              <option value="Ba">Basse-Normandie et Haute-Normandie</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <input class="form-control" id="zipId" type="number" placeholder="Code postale" [(ngModel)]="user.zip"
+              name="zip">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row mb-2">
+        <div class="offset-md-2 col-md-4">
+          <button class="btn btn-primary mr-3" type="submit" style="width:160px"
+            [title]="signupForm.valid ? 'Enregistrer vos données' : 'Merci de corriger les erreurs pour pouvoir enregistrer '"
+            [disabled]="!signupForm.valid">
+            Enregistrer
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<br>Dirty: {{ signupForm.dirty }}
+<br>Touched: {{ signupForm.touched }}
+<br>Valid: {{ signupForm.valid }}
+<br>Value: {{ signupForm.value | json }}

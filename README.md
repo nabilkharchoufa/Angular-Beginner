@@ -62,7 +62,16 @@ import { RouterModule } from '@angular/router';
   ],...
 ```
 
-#### Mettre en place les directives dans les templates ####
+### Mettre en place les directives dans les templates ###
+Ajouter la directive pour afficher la page de la route 
+app.component.html
+```html
+<div class="container">
+  <router-outlet></router-outlet>
+</div>
+```
+
+
 Ajouter les directives routerLink dans le app.component.html
 ```html
     <li class="nav-item">
@@ -72,6 +81,7 @@ Ajouter les directives routerLink dans le app.component.html
       <a class="nav-link">Films</a>
     </li>
 ```
+
 Angular routing step-02
 =======================
 

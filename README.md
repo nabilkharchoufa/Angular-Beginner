@@ -110,9 +110,41 @@ Activer le routage
       <a class="nav-link" [routerLink]="['/films']">Films</a>
     </li>
 ```
-### Strategie de nommage de path des routes ###
 
-### Activer une route depuis le code ###
+### Html5 style url vs hash-based url ###
+
+HTML 5 Style (…/welcome)
+Hash-based (…/#/welcome)
+
+Par défaut Angular utilise le style des urls de html5 pour le changer il faut le ajouter RouterModule.forRoot([...], { useHash: true }) dans le 'app.module.ts'
+
+```javascript
+import { RouterModule } from '@angular/router';
+...
+
+@NgModule({  imports: [
+BrowserModule,
+RouterModule.forRoot([...], { useHash: true })
+],
+declarations: [
+...
+],
+bootstrap: [ AppComponent ]
+})
+export class AppModule { }
+```
+### Strategie de nommage de path des routes ###
+Vu qu'on est des développeur l'approche la plus spontanné qu'on va avoir c'est ça :
+
+La liste des films : films
+Consulter le détail du film : film/:id
+Modifier les information d'un film : filmEdit/:id
+
+Ce n'est pas la bonne approche à suivre il faut penser à regrouper par 'films' pour faciliter le traitement après 
+
+La liste des films : films
+Consulter le détail du film : films/:id
+Modifier les information d'un film : films/:id/edit
 
 ### implémenter les fonctionalité se connecter et se déconnecter ###
 Répeter les mêmes étapes que "mettre en place le routage à une fonctionnalité" pour ajouter le routage à la page login dans User.module.ts

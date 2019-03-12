@@ -39,12 +39,12 @@ git checkout routing/step-00
 ```
 # Mettre en place le routage #
   
-## définir le base path ##
+### définir le base path ###
 
 ```bash 
 ng build --base-href /ateam/
 ```
-## importer Angular Routing ##
+### importer Angular Routing ###
 ```javascript 
 import { RouterModule } from '@angular/router';
 
@@ -53,19 +53,13 @@ import { RouterModule } from '@angular/router';
     BrowserModule,
     HttpClientModule,
     InMemoryWebApiModule.forRoot(FilmData, { delay: 1000 }),
-    RouterModule.forRoot([]),
-  ],...
-```
-
-
-### Ajouter la configuration de routes  ###
-Ajouter la configuration de routes dans la déclaration de notre RouterModule
-```javascript    
-      RouterModule.forRoot([
+    RouterModule.forRoot([
       { path: 'welcome', component: ATeamComponent },
+      { path: 'home', redirectTo: 'welcome', pathMatch: 'full' },
       { path: '', redirectTo: 'welcome', pathMatch: 'full' },
       { path: '**', component: PageNotFoundComponent }
     ]),
+  ],...
 ```
 
 #### Mettre en place les directives dans les templates ####
@@ -111,7 +105,7 @@ Activer le routage
 ### Activer une route depuis le code ###
 
 ### implémenter les fonctionalité se connecter et se déconnecter ###
-Répeter les mêmes étapes que "mettre en place le routage à une fonctionnalité pour ajouter le routage à la page login" dans User.module.ts
+Répeter les mêmes étapes que "mettre en place le routage à une fonctionnalité" pour ajouter le routage à la page login dans User.module.ts
 
 injecter le Router dans le constructeur 
 ```javascript

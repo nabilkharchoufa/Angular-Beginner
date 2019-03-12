@@ -15,6 +15,7 @@ Connaissances :
 * JavaScript
 * HTML
 * CSS
+* Angular: Component, Service, module
 
 Outils :
 * VSCode : 

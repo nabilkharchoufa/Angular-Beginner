@@ -118,21 +118,6 @@ Hash-based (…/#/welcome)
 
 Par défaut Angular utilise le style des urls de html5 pour le changer il faut le ajouter RouterModule.forRoot([...], { useHash: true }) dans le 'app.module.ts'
 
-```javascript
-import { RouterModule } from '@angular/router';
-...
-
-@NgModule({  imports: [
-BrowserModule,
-RouterModule.forRoot([...], { useHash: true })
-],
-declarations: [
-...
-],
-bootstrap: [ AppComponent ]
-})
-export class AppModule { }
-```
 ### Strategie de nommage de path des routes ###
 Vu qu'on est des développeur l'approche la plus spontanné qu'on va avoir c'est ça :
 

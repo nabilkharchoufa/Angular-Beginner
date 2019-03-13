@@ -1,19 +1,50 @@
 Angular routing step-01
 =======================
 
-- - - - 
+# Programme #
+Routing Basics
+Routing to Features
+Route Parameters
+Prefetching Data Using Route Resolvers
+Child Routes
+Route Guards
 
+# Prérequis #
+
+Connaissances :
+* JavaScript
+* HTML
+* CSS
+* Angular: Component, Service, module
+
+Outils :
+* VSCode : 
+https://code.visualstudio.com/ 
+* Node Package Manager : 
+  https://nodejs.org/fr/download/
+* npm : 
+ ```bash 
+        npm install -g npm@latest
+ ```
+* ANGULAR/CLI: 
+```bash 
+        npm install -g @angular/cli 
+```
+* Récupérer le projet lab02
+```bash
+git clone https://gitlab.boost.open.global/open/squads/squad-new-dev/multi-skilling/angular/lab02.git
+cd lab02
+git fetch --all
+git checkout routing/step-00
+```
 # Mettre en place le routage #
+  
+### définir le base path ###
 
-    * Définir le base path (Optionnel)
-    * Import le router 
-    * Configurer la route 
-    * Mettre en place dans la template 
-    * Activate route
-    
-## définir le base path ##
-`ng build --base-href /ateam/`
-## importer Angular Routing ##
+```bash 
+ng build --base-href /ateam/
+```
+### importer Angular Routing ###
 ```javascript 
 import { RouterModule } from '@angular/router';
 
@@ -22,22 +53,25 @@ import { RouterModule } from '@angular/router';
     BrowserModule,
     HttpClientModule,
     InMemoryWebApiModule.forRoot(FilmData, { delay: 1000 }),
-    RouterModule.forRoot([]),
-  ],...
-```
-
-
-### Ajouter la configuration de routes  ###
-Ajouter la configuration de routes dans la déclaration de notre RouterModule
-```javascript    
-      RouterModule.forRoot([
+    RouterModule.forRoot([
       { path: 'welcome', component: ATeamComponent },
+      { path: 'home', redirectTo: 'welcome', pathMatch: 'full' },
       { path: '', redirectTo: 'welcome', pathMatch: 'full' },
       { path: '**', component: PageNotFoundComponent }
     ]),
+  ],...
 ```
 
-#### Mettre en place les directives dans les templates ####
+### Mettre en place les directives dans les templates ###
+Ajouter la directive pour afficher la page de la route 
+app.component.html
+```html
+<div class="container">
+  <router-outlet></router-outlet>
+</div>
+```
+
+
 Ajouter les directives routerLink dans le app.component.html
 ```html
     <li class="nav-item">
@@ -47,6 +81,7 @@ Ajouter les directives routerLink dans le app.component.html
       <a class="nav-link">Films</a>
     </li>
 ```
+
 Angular routing step-02
 =======================
 
@@ -75,12 +110,29 @@ Activer le routage
       <a class="nav-link" [routerLink]="['/films']">Films</a>
     </li>
 ```
-####Strategie de nommage de path des routes ####
 
-####Activer une route depuis le code ####
+### Html5 style url vs hash-based url ###
 
-####implémenter les fonctionalité se connecter et se déconnecter ####
-Répeter les mêmes étapes que "mettre en place le routage à une fonctionnalité pour ajouter le routage à la page login" dans User.module.ts
+HTML 5 Style (…/welcome)
+Hash-based (…/#/welcome)
+
+Par défaut Angular utilise le style des urls de html5 pour le changer il faut le ajouter RouterModule.forRoot([...], { useHash: true }) dans le 'app.module.ts'
+
+### Strategie de nommage de path des routes ###
+Vu qu'on est des développeur l'approche la plus spontanné qu'on va avoir c'est ça :
+
+La liste des films : films
+Consulter le détail du film : film/:id
+Modifier les information d'un film : filmEdit/:id
+
+Ce n'est pas la bonne approche à suivre il faut penser à regrouper par 'films' pour faciliter le traitement après 
+
+La liste des films : films
+Consulter le détail du film : films/:id
+Modifier les information d'un film : films/:id/edit
+
+### implémenter les fonctionalité se connecter et se déconnecter ###
+Répeter les mêmes étapes que "mettre en place le routage à une fonctionnalité" pour ajouter le routage à la page login dans User.module.ts
 
 injecter le Router dans le constructeur 
 ```javascript
@@ -449,15 +501,13 @@ const ROUTES = [
   Dans les fichiers film-detail.component.ts et edit-film.component.ts changez la façon dont on récupére le film : 
 
 ```javascript
-  constructor(private filmService: FilmService, private route: ActivatedRoute) {}
-
-  ngOnInit(): void {
-    this.route.data.subscribe(data => {
-      const filmResolved: FilmResolved = data['film'];
-      this.errorMessage = filmResolved.error;
-      this.onFilmRetrieved(filmResolved.film);
-    });
+  constructor(private filmService: FilmService, private route: ActivatedRoute) {
+    const filmResolved: FilmResolved = this.route.snapshot.data['film'];
+    this.errorMessage = filmResolved.error;
+    this.onFilmRetrieved(filmResolved.film);
   }
+
+  ngOnInit(): void {}
 ```
 
 testez...
@@ -470,25 +520,421 @@ Il y a un problème, vous l'avez vu, non ? si on appui sur ajouter un film la m�
 
 alors pour remédier à ce problème on va utiliser les observables :
 
-```javascript
-  constructor(private filmService: FilmService, private route: ActivatedRoute) {}
 
-  ngOnInit(): void {
-    this.route.data.subscribe(data => {
-      const filmResolved: FilmResolved = data['film'];
-      this.errorMessage = filmResolved.error;
-      this.onFilmRetrieved(filmResolved.film);
-    });
-  }
+Angular routing step-05 child route
+===============================================
+
+- - - - 
+
+Parmis les cas d'utilisation de child step on trouve :
+  - Tabbed pages
+  - Master/detail layouts
+  - Embedded templates
+  - Feature modules
+  - Lazy loading
+
+###Contenu du step ###
+  - Using Child Routes
+  - Configuring Child Routes
+  - Placing the Child View
+  - Activating Child Routes
+  - Obtaining Data for Child Routes
+  - Validating Across Child Routes
+
+###Configuring Child Routes ###
+
+On commence par configurer les routes dans le films.module.ts
+
+```javascript
+const ROUTES = [
+  { path: 'films', component: FilmsComponent },
+  { path: 'films/:id', component: FilmDetailComponent },
+  {
+    path: 'films/:id/edit',
+    component: EditFilmComponent,
+    children: [
+      {
+        path: '', redirectTo: 'info', pathMatch: 'full'
+      },
+      {
+        path: 'info', component: FilmEditBasicInfoComponent
+      },
+      {
+        path: 'acteurs', component: FilmEditActeursComponent
+      }
+    ]
+  },
+];
+
+.................
+
+declarations: [
+    FilmsComponent,
+    FilmDetailComponent,
+    EditFilmComponent,
+    FilmEditBasicInfoComponent,
+    FilmEditActeursComponent
+  ]
+
 ```
 
-ça fonctionne de nouveau (y), on maintient le cap ....
+###Placing the Child View ###
 
+Modifier le html de modification pour avoir deux tabs infos et acteurs 
 
+```html
+<div class="card-body">
+  <div class="wizard">
+      <a [routerLink]="['info']">
+        infos
+      </a>
+      <a [routerLink]="['acteurs']">
+        acteurs
+      </a>
+  </div>
+<router-outlet></router-outlet>
+</div>
+```
 
+###Activating Child Routes ###
+Il existe deux façon d'activer les routes :
 
+modifier les url dans les tabs de la page modification de film 
+  - Absolute path : 
+```html 
+    <a [routerLink]="['/films', film.id, 'edit', 'info']">Info</a> 
+```
+  - Relative path
+```html 
+    <a [routerLink]="['info']">Info</a> 
+```
+le html de edit film il va ressembler à ça 
+```html
+<div class="card-body">
+    <div class="wizard">
+      <a [routerLink]="['info']">
+        infos
+      </a>
+      <a [routerLink]="['acteurs']">
+        acteurs
+      </a>
+    </div>
+    <router-outlet></router-outlet>
+    <div class="col-md-12">
+      <button class="btn btn-primary mr-3" style="width:120px" type="button"
+        [title]="'Enregistrer vos données'"
+        (click)="saveFilm()">
+        Enregistrer
+      </button>
+      <button class="btn btn-outline-secondary mr-3" style="width:100px" type="button"
+        title="Annuler les modifications">
+        Annuler
+      </button>
+      <button class="btn btn-outline-warning" style="width:100px" type="button" title="Supprimer ce film"
+        (click)="deleteFilm()">
+        Supprimer
+      </button>
+    </div>
+  </div>
+```
+###Obtaining Data for a Child Route ###
 
+Maintenat on essayer de récupérer le vrai objet film: il y a moyens :
 
+  - Film Data Service
+```javascript 
+this.filmService.getFilm(id)
+.subscribe(film => this.film = film);
+```
+  - Child Route Resolver : Récuperer le film avant de charger le child route 
+```javascript 
+this.film = this.route.snapshot.data['film'];
+```
+  - Parent Route Resolver: le component parent utilise le même objet film 
+```javascript 
+this.film = this.route.parent.snapshot.data['film'];
+```
 
+Pour commencer on va modifier le EditFilmBasicInfoComponent pour récupérer l'objet film 
+
+```javascript
+  ngOnInit(): void {
+    this.route.parent.data.subscribe(data => {
+      const filmResolved: FilmResolved = data['film'];
+      this.errorMessage = filmResolved.error;
+      this.film = filmResolved.film;
+    });
+  }
+
+```
+Faites la même chose pour l'onglet acteurs
+
+Nous avons pas encore finit, la validation des champs n'est pas bien fait surtout si on passe de la modification à la création on a toujours les erreurs de modification affiché 
+
+On va utiliser le filmForm pour initialiser l'objet chaque fois qu'on a un nouveau objet film 
+```javascript
+  ngOnInit(): void {
+    // TODO UNSUBSCRIBE
+    this.route.parent.data.subscribe(data => {
+      ////////////////////////////////
+      if (this.filmForm){
+        this.filmForm.reset();
+      }
+      ////////////////////////////////
+      const filmResolved: FilmResolved = data['film'];
+      this.errorMessage = filmResolved.error;
+      this.film = filmResolved.film;
+    });
+  }
+
+```
+
+Maintenant on va essayer d'enregistrer sans saisir le code de film, Oups, ça a passé, on devrait désactiver si le formulaire n'est pas vide, oui je sais les boutons sont dans l'élement parent. 
+
+Pour cela on va ajouter des fonctions de validation dans le component edit-film.component.ts
+
+```javascript
+
+  isValid(path?: string): boolean {
+    this.validate();
+
+    // dans le cas où on veut faire la validation seulement pour un onglet 
+    if (path) {
+      return this.dataIsValid[path];
+    }
+    //Dans le cas où il y a +++ tabs
+    return this.dataIsValid && Object.keys(this.dataIsValid).every(d => this.dataIsValid[d] === true);
+  }
+
+  validate(): void {
+    this.dataIsValid = {};
+
+    // tabs info
+    if (this.film.filmName && this.film.filmCode && this.film.filmCode.length != 4) {
+      this.dataIsValid['info'] = true;
+    } else {
+      this.dataIsValid['info'] = false;
+    }
+    // tabs acteurs
+    if (this.film.acteurs && this.film.acteurs.length > 0) {
+      this.dataIsValid['acteurs'] = true;
+    } else {
+      this.dataIsValid['acteurs'] = false;
+    }
+  }
+```
+et dans le html on va désactiver le bouton tant que le form n'est pas valid 
+
+```html
+<button class="btn btn-primary mr-3" style="width:120px" type="button"
+  [title]="'Enregistrer vos données'"
+  [disabled]="!isValid()"
+  (click)="saveFilm()">
+  Enregistrer
+</button>
+```      
+
+Angular routing step-06 Guards 
+==============================
+
+Depuis qu'on a commencé développé l'application vous vous posez la question quand on va ajouter la vérification de l'authentification, bah c'est maintenant ou jamais :-) 
+
+# Contenu du step #
+
+  - Using Route Guards
+  - canActivate Guard
+  - Sharing Data with a Guard
+  - canActivateChild Guard
+  - canDeactivate Guard
+
+Protéger les routes avec les Guards 
+
+  - canActivate : protége la route lors de la navigation 
+
+  - canActivateChild : protége child route lors de la navigation 
+
+  - canDeactivate : appelée quand on essaye de quitter la route 
+
+  - canLoad : Protéger un async route 
+
+  - resolve : Prefetch data avant d'activer la route 
+
+le workflow de guerds est le suivant  :
+* canDeactivate : vérifier avant de quitter la route 
+  * canLoad : vérifier est-ce qu'il a le droit de charger les données 
+    * canActivateChild : vérifier la route fille 
+      * canActivate : vérifier la route mère 
+        * resolve : charger les données après avoir être sûr de tout ce qu'on a checké ;-)
+
+# Créer un Guard service #
+
+Nous allons utilisé le angular cli pour générer un Guard, lancer la commande :
+```bash
+ng g g user/auth
+```
+Ensuite on va vérifer que l'utilisateur est connecté à l'aide de notre service auth.service.ts pour le laisser passer à /films sinon une redirection à la page login 
+
+```javascript
+  constructor(private authService: AuthService, private router: Router) { }
+
+  canActivate(
+    next: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    return this.checkIfUserisLogged();
+  }
+
+  checkIfUserisLogged(): boolean {
+    if (this.authService.isLoggedIn) {
+      return true;
+    } else {
+      this.router.navigate(['login']);
+      return false;
+    }
+  }
+```
+Nous allons faire une petite modification sur les routes pour les regrouper avec '/films' en utilisan children pour nous faciliter la vérification avec Guard 
+
+```javascript
+const ROUTES = [
+  {
+    path: 'films',
+    canActivate: [AuthGuard],
+    children: [
+      {
+        path: '',
+        component: FilmsComponent
+      },
+      {
+        path: ':id',
+        component: FilmDetailComponent,
+        resolve: { film: FilmResolver }
+      },
+      {
+        path: ':id/edit',
+        component: EditFilmComponent,
+        resolve: { film: FilmResolver },
+        children: [
+          {
+            path: '', redirectTo: 'info', pathMatch: 'full'
+          },
+          {
+            path: 'info', component: EditFilmBasicInfoComponent
+          },
+          {
+            path: 'acteurs', component: EditFilmActeursComponent
+          }
+        ]
+      }
+    ]
+  }
+];
+```
+Faisant un petit test, aha, on peut plus aller se balader dans l'application sans être connecté :) 
+
+Mais il y a un petit soucis, après authentification je suis redirigé vers la page de films alors que je voulais ajouter un film
+
+Je suis d'accord, parce que nous avons fait la redirection en dure aprés l'authentification
+
+pour remédier à ça on a besoin de partager l'url destionation avec les guards
+
+pour faire cela on a le resolver et les services 
+
+  - resolver c'est mort parce qu'il est appelé après les guards
+
+  - service : c'est possible puisque c'est un singleton 
+
+```javascript
+// service 
+export class AuthService {
+  currentUser: User;
+  ////////////////////////
+  urlDestination: string;
+  ////////////////////////  
+
+  ..................
+
+  // login component
+  
+  login(loginForm: NgForm) {
+    if (loginForm && loginForm.valid) {
+      const userName = loginForm.form.value.userName;
+      const password = loginForm.form.value.password;
+      this.authService.login(userName, password);
+      console.log(this.authService.urlDestination);
+      ////////////////////////////////////////////////////////////////////////////////////  
+      this.router.navigate([this.authService.urlDestination || '/films' ]);
+      ////////////////////////////////////////////////////////////////////////////////////  
+    } else {
+      this.errorMessage = 'Please enter a user name and password.';
+    }
+  }
+
+  // Auth guard
+
+    checkIfUserisLogged(url: string): boolean {
+    if (this.authService.isLoggedIn) {
+      return true;
+    } else {
+      //////////////////////////////////////////
+      this.authService.urlDestination = url;
+      //////////////////////////////////////////
+      this.router.navigate(['login']);
+      return false;
+    }
+  }
+
+```
+
+canActivated : ne va faire aucune vérification si on change que le child route, c'est pourquoi on a besoin de CanActivatedChild 
+
+CanActivatedChild fonctionne comme le canAcivated
+
+canDeactivete Guard : 
+  - vérifier s'il utilisateur a tout sauvegardé avant de quitter
+
+On va générer un nouveau guard :
+
+```bash
+ng g g films/edit-film/edit-film
+```
+
+Change l'implémentation
+
+```javascript
+////EditFilmGuard
+  canDeactivate(component: EditFilmComponent,
+                currentRoute: ActivatedRouteSnapshot,
+                currentState: RouterStateSnapshot,
+                nextState?: RouterStateSnapshot): boolean | Observable<boolean> | Promise<boolean> {
+    if(component.isDirty){
+      const filmName = component.film.filmName || "Nouveau film";
+      return confirm(`Vous êtes sûr de quitter, vous avez des modification non enregistré pour le film  ${filmName} ? `);
+    }
+    return true;
+  } 
+
+  /// vérification sur le component que l'objet film n'a pas été changé 
+  private originalFilm: Film;
+  private currentFilm: Film;
+  private dataIsValid: { [key: string]: boolean } = {};
+
+  get isDirty(): boolean {
+    return JSON.stringify(this.originalFilm) !==
+      JSON.stringify(this.currentFilm);
+  }
+
+// fonction appelé quand on fait réf à "this.film"
+  get film(): Film {
+    return this.currentFilm;
+  }
+//// fonction appelé quand on fait réf à "this.film = "
+  set film(value: Film) {
+    this.currentFilm = value;
+    this.originalFilm = { ...value };
+  }
+.............
+
+  // 
+```
 
 

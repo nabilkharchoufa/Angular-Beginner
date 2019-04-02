@@ -29,10 +29,6 @@ Template
   - Validation error messages
   - Form model automatically generated
 
-Component Class
-  - Properties for data binding (data model)
-  - Methods for form operations, such as submit
-
 ## Hands-on ##
 
 Nous allons créer une application angular qui gère l'inscription des utilisateurs.
@@ -643,4 +639,29 @@ Je suis d'accord avec vous sur le fait que c'est facile et rapide, mais je tiens
 
 Pour cela, Angular a une deuxième façon de faire les formulaires plus stylé et classe qu'on va aborder dans la session de Intermidéaire 
 
+# Reactive Form #
 
+Les réactives forms se basent sur les obsevables et sur une gestion immutable de states de forms, toute la logique doit être porter par le component class
+
+Responsabilité : 
+
+Component Class
+  - Properties for data binding (data model)
+  - Methods for form operations, such as submit Component Class
+  - Form model
+  - Validation rules
+  - Validation error messages
+  - Properties for managing data (data model)
+  - Methods for form operations, such as submit
+Template
+  - Form element
+  - Input element(s)
+  - Binding to form model
+
+# Hands-on #
+
+Nous allons commencer par User components class :
+
+1. Supprimer le paramétre userForm de la fonction save
+2. Supprimer l'import `import { NgForm } from '@angular/forms;`
+3. importer FormGroup et formControl

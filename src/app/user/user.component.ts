@@ -17,7 +17,7 @@ export class UserComponent implements OnInit {
   ngOnInit() {
   }
 
-  save(userForm: NgForm) {
+  save() {
     console.log(userForm.form);
     console.log('Saved: ' + JSON.stringify(userForm.value));
   }

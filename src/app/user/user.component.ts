@@ -1,8 +1,6 @@
+import { FormGroup, FormBuilder } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
 import { User } from './user';
-
-
 @Component({
   selector: 'app-user',
   templateUrl: './user.component.html',
@@ -11,14 +9,30 @@ import { User } from './user';
 export class UserComponent implements OnInit {
 
   user = new User();
+  userForm: FormGroup;
 
-  constructor() { }
+  constructor(private formBuilder: FormBuilder) { }
 
   ngOnInit() {
+    this.userForm = this.formBuilder.group({
+      firstName: '',
+      lastName: { value: 'N/A', disabled: true },
+      email: '',
+      sendCatalogue: true
+    });
+  }
+  
+  save() {
+    console.log(this.userForm.value);
+    console.log('Saved: ' + JSON.stringify(this.userForm.value));
   }
 
-  save() {
-    console.log(userForm.form);
-    console.log('Saved: ' + JSON.stringify(userForm.value));
+  setData() {
+    this.userForm.patchValue({
+      firstName: 'Ibrahim',
+      lastName: 'Lebœuf',
+      sendCatalogue: true
+    });
   }
+
 }

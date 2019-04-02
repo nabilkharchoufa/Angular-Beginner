@@ -4,19 +4,20 @@
   </div>
 
   <div class="card-body">
-    <form novalidate (ngSubmit)="save(signupForm)" #signupForm="ngForm">
+    <form novalidate (ngSubmit)="save()" [formGroup]="userForm">
 
       <div class="form-group row mb-2">
         <label class="col-md-2 col-form-label" for="firstNameId">Prénom</label>
         <div class="col-md-8">
           <input class="form-control" id="firstNameId" type="text" placeholder="Prénom (obligatoire)" required
-            minlength="3" [(ngModel)]=user.firstName name="firstName" #firstNameVar="ngModel"
-            [ngClass]="{'is-invalid': (firstNameVar.touched || firstNameVar.dirty) && !firstNameVar.valid }" />
+            minlength="3" 
+            formControlName="firstName" 
+            [ngClass]="{'is-invalid': (userForm.get('firstName').touched || userForm.get('firstName').dirty) && !userForm.get('firstName').valid }" />
           <span class="invalid-feedback">
-            <span *ngIf="firstNameVar.errors?.required">
+            <span *ngIf="userForm.get('firstName').errors?.required">
               Le prénom est obligatoir.
             </span>
-            <span *ngIf="firstNameVar.errors?.minlength">
+            <span *ngIf="userForm.get('firstName').errors?.minlength">
               le prénom doit contenir au minimum 3 caractères.
             </span>
           </span>
@@ -27,13 +28,14 @@
         <label class="col-md-2 col-form-label" for="lastNameId">Nom</label>
         <div class="col-md-8">
           <input class="form-control" id="lastNameId" type="text" placeholder="Nom (obligatoire)" required
-            maxlength="50" [(ngModel)]="user.lastName" name="lastName" #lastNameVar="ngModel"
-            [ngClass]="{'is-invalid': (lastNameVar.touched || lastNameVar.dirty) && !lastNameVar.valid }" />
+            formControlName="lastName" 
+            maxlength="50"
+            [ngClass]="{'is-invalid': (userForm.get('lastName').touched || userForm.get('lastName').dirty) && !userForm.get('lastName').valid }" />
           <span class="invalid-feedback">
-            <span *ngIf="lastNameVar.errors?.required">
+            <span *ngIf="userForm.get('lastName').errors?.required">
               Le nom est obligatoir.
             </span>
-            <span *ngIf="lastNameVar.errors?.maxlength">
+            <span *ngIf="userForm.get('lastName').errors?.maxlength">
               le nom doit contenir au maximum 50 caractères.
             </span>
           </span>
@@ -44,13 +46,13 @@
         <label class="col-md-2 col-form-label" for="emailId">Email</label>
         <div class="col-md-8">
           <input class="form-control" id="emailId" type="email" placeholder="Email (required)" required email
-            [(ngModel)]="user.email" name="email" #emailVar="ngModel"
-            [ngClass]="{'is-invalid': (emailVar.touched || emailVar.dirty) && !emailVar.valid }" />
+            formControlName="email"             
+            [ngClass]="{'is-invalid': (userForm.get('email').touched || userForm.get('email').dirty) && !userForm.get('email').valid }" />
           <span class="invalid-feedback">
-            <span *ngIf="emailVar.errors?.required">
+            <span *ngIf="userForm.get('email').errors?.required">
               Merci de saisir une adresse mail.
             </span>
-            <span *ngIf="emailVar.errors?.email">
+            <span *ngIf="userForm.get('email').errors?.email">
               Merci de saisir une adresse mail valid.
             </span>
           </span>
@@ -61,14 +63,14 @@
         <div class="col-md-8">
           <div class="form-check">
             <label class="form-check-label">
-              <input class="form-check-input" id="sendCatalogId" type="checkbox" [(ngModel)]="user.sendCatalog"
-                name="sendCatalog"> Envoyer moi le catalogue
+              <input class="form-check-input" id="sendCatalogId" type="checkbox" formControlName="sendCatalogue"               
+              > Envoyer moi le catalogue
             </label>
           </div>
         </div>
       </div>
 
-      <div *ngIf="user.sendCatalog">
+      <!-- <div *ngIf="user.sendCatalog">
         <div class="form-group row mb-2">
           <label class="col-md-2 col-form-label pt-0">Type d'adresse</label>
           <div class="col-md-8">
@@ -131,21 +133,22 @@
               name="zip">
           </div>
         </div>
-      </div>
+      </div> -->
 
-      <div class="form-group row mb-2">
-        <div class="offset-md-2 col-md-4">
-          <button class="btn btn-primary mr-3" type="submit" style="width:160px"
-            [title]="signupForm.valid ? 'Enregistrer vos données' : 'Merci de corriger les erreurs pour pouvoir enregistrer '"
-            [disabled]="!signupForm.valid">
-            Enregistrer
+      <div class="form-group row">
+        <button class="btn btn-primary mr-1" type="submit" style="width:160px"
+          [title]="userForm.valid ? 'Enregistrer vos données' : 'Merci de corriger les erreurs pour pouvoir enregistrer '"
+          [disabled]="!userForm.valid">
+          Enregistrer
+        </button>
+          <button class="btn btn-light mr-1" style="width:160px" (click)="setData()">
+            initialiser
           </button>
-        </div>
       </div>
     </form>
   </div>
 </div>
-<br>Dirty: {{ signupForm.dirty }}
-<br>Touched: {{ signupForm.touched }}
-<br>Valid: {{ signupForm.valid }}
-<br>Value: {{ signupForm.value | json }}
+<br>Dirty: {{ userForm.dirty }}
+<br>Touched: {{ userForm.touched }}
+<br>Valid: {{ userForm.valid }}
+<br>Value: {{ userForm.value | json }}

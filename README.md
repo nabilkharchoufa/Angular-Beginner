@@ -73,7 +73,11 @@ Remplacer le contenu de app.component.html par
   <app-user></app-user>
 </div>
 ```
-importer formMdule dans app.module.ts
+importer formMdule dans app.module.ts pour avoir accès à :
+- ngForm 
+- ngModel
+- ngModelGroup
+
 ```javascript
 @NgModule({
   declarations: [
@@ -253,9 +257,9 @@ Maintenant on a une base de code pour commencer à créer notre formulaire templ
 - Chaque fois que angular trouve ngModel il va créer un formControl avec comme clé le 'name' et va l'attacher à formGroup
 
 Trois façon possible de le faire : 
-1. [(ngModel)]
-2. [ngModel]
-3. ngModel
+1. [(ngModel)] => Two-way data binding
+2. [ngModel] => 
+3. ngModel => 
 
 Pour plus d'infos aller sur la doc officielle :
 https://angular.io/guide/template-syntax#ngModel
@@ -275,7 +279,7 @@ Mettez l'attribut sur les éléments de la template on mettant comme valeur l'at
         <label class="col-md-2 col-form-label" for="firstNameId">Prénom</label>
         <div class="col-md-8">
           <input class="form-control" id="firstNameId" type="text" placeholder="Prénom (obligatoire)"
-          [(ngModel)]=user.firstName name="firstName" />
+          [(ngModel)]="user.firstName" name="firstName" />
         </div>
       </div>
 
@@ -452,8 +456,12 @@ la validité du formulaire est true parce qu'il n'y a aucun contrôle sur les é
             </span>
           </span>
 ```
-Angular nous fournit des attributs pour valider nos éléments comme 'required' et 'minlength="3"', d'accord, mais c'est quoi le firstNamVar ? 
-On peut exporter le ngModel dans une référence comme on a fait pour le 'form', ça va nous permettre d'accéder au formControl de chaque élément du formulaire, je ne l'ai pas caché, mais j'attendais le bon moment :-D, c'est très utile, parce qu'on va pouvoir tester, est-ce que l'utilisateur a touché un élément (focus) ou pas, est-ce qu'il l'a modifié ? Est-ce que notre élément est valide ? Est-ce qu'il y a des erreurs ?
+Angular nous fournit des attributs pour valider nos éléments comme 'required' et 'minlength="3"'
+
+C'est quoi le firstNamVar ? 
+
+On peut exporter le ngModel dans une référence comme on a fait pour le 'form', ça va nous permettre d'accéder au formControl de chaque élément du formulaire.
+c'est très utile, parce qu'on va pouvoir tester, est-ce que l'utilisateur a touché un élément (focus) ou pas, est-ce qu'il l'a modifié ? Est-ce que notre élément est valide ? Est-ce qu'il y a des erreurs ?
 
 Ajouter les autres contrôles nécessaire.
 
@@ -633,5 +641,6 @@ Je suis d'accord avec vous sur le fait que c'est facile et rapide, mais je tiens
 * Des validations complexes à mettre en place
 * Immutabilité de données utilisée
 
-Pour cela, Angulair a une deuxième façon de faire les formulaires plus stylé et classe qu'on va aborder dans la session de Intermidéaire 
+Pour cela, Angular a une deuxième façon de faire les formulaires plus stylé et classe qu'on va aborder dans la session de Intermidéaire 
+
 

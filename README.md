@@ -896,6 +896,175 @@ Il y a une façon d'utiliser les formBuilder
   ```
 
   LastNAme utilise un objet comme valeur initial, il peut prendre aussi un tableau avec ce qui vient après comme validations, nous allons le voir après 
-   
+
+# validators #
+  
+Nous allons utilisé la classe Validators de Angular, elle nous fournie des validateurs déjà prêt, pour ajouter des validations il faut les spécifier comme 2e paramètre dans les formControl dans le formBuilder
+
+```typeScript
+ngOnInit() {
+  this.userForm = this.formBuilder.group({
+    firstName: ['', [Validators.required, Validators.minLength(3)]],
+    lastName: '',
+    email: '',
+    sendCatalogue: true
+  });
+}
+```
+Essayer de répéter le processus pour les autres champs  
 
 
+* Ajuster la validation selon le besoin 
+
+Supposant que l'utilisateur a le choix entre se connecter avec un login ou un identifiant, nous allons pouvoir le faire à l'aide de :
+myControl.setValidators
+myControl.clearValidators
+myControl.updateValueAndValidity
+
+
+```typeScript
+//------------------------------------------------------------
+  ngOnInit() {
+    this.userForm = this.formBuilder.group({
+      firstName: ['', [Validators.required, Validators.minLength(3)]],
+      lastName: '',
+      email: '',
+      phone: '',
+      choiceAuth: 'email',
+      sendCatalogue: true
+    });
+  }
+// ............................................
+  authBy(choice: string): void {
+    const phoneControl = this.userForm.get('phone');
+    if (choice === 'phone') {
+      phoneControl.setValidators(Validators.required);
+    } else {
+      phoneControl.clearValidators();
+    }
+    phoneControl.updateValueAndValidity();
+  }
+
+}
+```
+user.ts
+```typeScript
+export class User {
+
+  constructor(public firstName = '',
+              public lastName = '',
+              public email = '',
+              public phone = '',
+              public sendCatalog = false,
+              public addressType = 'home',
+              public street1?: string,
+              public street2?: string,
+              public city?: string,
+              public state = '',
+              public zip?: string,
+              ) { }
+}
+
+```
+
+```html
+      <div class="form-group row mb-2">
+        <label class="col-md-2 col-form-label" for="phoneId">Téléphone</label>
+        <div class="col-md-8">
+          <input class="form-control" id="phoneId" type="tel" placeholder="Phone" formControlName="phone"
+            [ngClass]="{'is-invalid': !userForm.get('phone').valid }" />
+          <span class="invalid-feedback">
+            <span *ngIf="userForm.get('phone').errors?.required">
+              Merci de saisir un numéro de téléphone.
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <div class="form-group row mb-2">
+        <label class="col-md-2 col-form-label pt-0">S'authentifier avec</label>
+        <div class="col-md-8">
+          <div class="form-check form-check-inline">
+            <label class="form-check-label">
+              <input class="form-check-input" type="radio" value="email" formControlName="choiceAuth"
+                (click)="authBy('email')"> email
+            </label>
+          </div>
+          <div class="form-check form-check-inline">
+            <label class="form-check-label">
+              <input class="form-check-input" type="radio" value="text" formControlName="choiceAuth"
+                (click)="authBy('phone')"> Telephone
+            </label>
+          </div>
+        </div>
+      </div>
+```
+
+* Custom validator 
+
+Supposant qu'on veut ajouter l'age et mettre une validation sur l'age saisi 
+
+Hands-on 
+
+user.ts
+```typeScript
+export class User {
+
+  constructor(public firstName = '',
+              public lastName = '',
+              public email = '',
+              public phone = '',
+              public sendCatalog = false,
+              public addressType = 'home',
+              public street1?: string,
+              public street2?: string,
+              public city?: string,
+              public state = '',
+              public zip?: string,
+              public age?: number,
+              ) { }
+}
+
+```
+
+
+```typeScript
+// si ça va être utiliser dans d'autre component il vaut mieux le faire dans une class apart
+function ageRange(min: number, max: number): ValidatorFn {
+  return (c: AbstractControl): { [key: string]: boolean } | null => {
+    if (c.value !== null && (isNaN(c.value) || c.value < min || c.value > max)) {
+      return { 'range': true };
+    }
+    return null;
+  };
+}
+//--------------------------------
+  ngOnInit() {
+    this.userForm = this.formBuilder.group({
+      firstName: ['', [Validators.required, Validators.minLength(3)]],
+      lastName: '',
+      email: '',
+      phone: '',
+      choiceAuth: 'email',
+      age: [null, ageRange(0, 150)],
+      sendCatalogue: true
+    });
+  }
+```
+
+```html
+<div class="form-group row mb-2">
+  <label class="col-md-2 col-form-label" for="ageId">Age</label>
+  <div class="col-md-8">
+    <input class="form-control" id="ageId" placeholder="Age" formControlName="age" type="number"
+      [ngClass]="{'is-invalid': !userForm.get('age').valid }" />
+    <span class="invalid-feedback">
+      <span *ngIf="userForm.get('age').errors">
+        Valeur possible entre 18 et 150.
+      </span>
+    </span>
+  </div>
+</div>
+```
+
+À suivre .....................>>>

@@ -173,7 +173,7 @@ Pourquoi définir des routes dans chaque module ?
 ordre d'imports est-il intéressant ?
 
 
-###Mieux organiser le code ###
+### Mieux organiser le code ###
 créer un fichier app-routing.module.ts à côté de app.module.ts avec la déclaration de nos routes 
 ```javascript
 import { PageNotFoundComponent } from './page-not-found.component';
@@ -210,7 +210,7 @@ imports: [
 ```
 essayer est-ce que l'application marche toujours  ? 
 
-C'est normal il faut respecter l'ordre pour que les routes fils soient reconnue
+C'est normal il faut respecter l'ordre pour que les routes enfants soient reconnue
 ```javascript
 imports: [
     BrowserModule,

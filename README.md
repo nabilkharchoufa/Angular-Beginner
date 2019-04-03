@@ -82,6 +82,18 @@ Ajouter les directives routerLink dans le app.component.html
     </li>
 ```
 
+Mettre à jour la directive dans le app.component.html
+```html
+<li class="nav-item" *ngIf="isLoggedIn">
+      <a class="nav-link" (click)="logOut()">déconnexion</a>
+    </li>
+  </ul>
+</nav>
+<div class="container">
+  <router-outlet></router-outlet>
+</div>
+```
+
 Angular routing step-02
 =======================
 
@@ -139,11 +151,16 @@ injecter le Router dans le constructeur
 constructor(private authService: AuthService, private router: Router) { }
 ```
 
-activer la route depuis le code pour rediriger l'utilsateur vers la page de login 
+activer la route depuis le code pour rediriger l'utilsateur vers la page de film après authentification 
 ```javascript
 this.router.navigate(['/films']);
 ```
-
+Ajouter l'attribut isLoggedIn dans app.component.ts
+```javascript
+get isLoggedIn(): boolean {
+  return this.authService.isLoggedIn;
+}
+```
 Maintenant il faut définir le logout, allez dans le app.component.ts et créer le lougout() :
 ```javascript
   logOut(): void {
@@ -156,7 +173,7 @@ Pourquoi définir des routes dans chaque module ?
 ordre d'imports est-il intéressant ?
 
 
-###Mieux organiser le code ###
+### Mieux organiser le code ###
 créer un fichier app-routing.module.ts à côté de app.module.ts avec la déclaration de nos routes 
 ```javascript
 import { PageNotFoundComponent } from './page-not-found.component';
@@ -193,7 +210,7 @@ imports: [
 ```
 essayer est-ce que l'application marche toujours  ? 
 
-C'est normal il faut respecter l'ordre pour que les routes fils soient reconnue
+C'est normal il faut respecter l'ordre pour que les routes enfants soient reconnue
 ```javascript
 imports: [
     BrowserModule,
@@ -219,7 +236,7 @@ Angular routing step-03 routage avec paramétres
 
 ###Required Parameters ###
 
-Dans le fichier app.module.ts ajouter les routes pour afficher le détail et la modification
+Dans le fichier film.module.ts ajouter les routes pour afficher le détail et la modification
 Faite attention à la nommenctlature, nous les avons regroupés par 'films' ...
 
 ```Javascript 

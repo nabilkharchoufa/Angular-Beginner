@@ -1067,4 +1067,9 @@ function ageRange(min: number, max: number): ValidatorFn {
 </div>
 ```
 
+# Validation dans les data models #
+
+https://www.npmjs.com/package/@rxweb/reactive-form-validators
+https://stackblitz.com/edit/complete-rxweb-angular-reactive-form-validator-example?file=src%2Fapp%2Fuser%2Fmodels%2Fuser.model.ts
+
 À suivre .....................>>>

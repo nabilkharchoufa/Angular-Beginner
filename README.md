@@ -151,7 +151,7 @@ injecter le Router dans le constructeur
 constructor(private authService: AuthService, private router: Router) { }
 ```
 
-activer la route depuis le code pour rediriger l'utilsateur vers la page de login 
+activer la route depuis le code pour rediriger l'utilsateur vers la page de film après authentification 
 ```javascript
 this.router.navigate(['/films']);
 ```

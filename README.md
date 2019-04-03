@@ -82,6 +82,18 @@ Ajouter les directives routerLink dans le app.component.html
     </li>
 ```
 
+Mettre à jour la directive dans le app.component.html
+```html
+<li class="nav-item" *ngIf="isLoggedIn">
+      <a class="nav-link" (click)="logOut()">déconnexion</a>
+    </li>
+  </ul>
+</nav>
+<div class="container">
+  <router-outlet></router-outlet>
+</div>
+```
+
 Angular routing step-02
 =======================
 
@@ -143,7 +155,12 @@ activer la route depuis le code pour rediriger l'utilsateur vers la page de logi
 ```javascript
 this.router.navigate(['/films']);
 ```
-
+Ajouter l'attribut isLoggedIn dans app.component.ts
+```javascript
+get isLoggedIn(): boolean {
+  return this.authService.isLoggedIn;
+}
+```
 Maintenant il faut définir le logout, allez dans le app.component.ts et créer le lougout() :
 ```javascript
   logOut(): void {
@@ -219,7 +236,7 @@ Angular routing step-03 routage avec paramétres
 
 ###Required Parameters ###
 
-Dans le fichier app.module.ts ajouter les routes pour afficher le détail et la modification
+Dans le fichier film.module.ts ajouter les routes pour afficher le détail et la modification
 Faite attention à la nommenctlature, nous les avons regroupés par 'films' ...
 
 ```Javascript 

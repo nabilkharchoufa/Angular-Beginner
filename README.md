@@ -255,7 +255,7 @@ Maintenant on a une base de code pour commencer à créer notre formulaire templ
 Trois façon possible de le faire : 
 1. [(ngModel)] => model <=> view
 2. [ngModel] => model => view
-3. (ngModel) => handler <= view
+3. (action) => handler <= view
 
 
 Pour plus d'infos aller sur la doc officielle :

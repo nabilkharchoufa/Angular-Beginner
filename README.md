@@ -253,9 +253,10 @@ Maintenant on a une base de code pour commencer à créer notre formulaire templ
 - Chaque fois que angular trouve ngModel il va créer un formControl avec comme clé le 'name' et va l'attacher à formGroup
 
 Trois façon possible de le faire : 
-1. [(ngModel)] => Two-way data binding
-2. [ngModel] => 
-3. ngModel => 
+1. [(ngModel)] => model <=> view
+2. [ngModel] => model => view
+3. (ngModel) => handler <= view
+
 
 Pour plus d'infos aller sur la doc officielle :
 https://angular.io/guide/template-syntax#ngModel
